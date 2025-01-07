@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 import datetime
 import json
+from PIL import Image, ImageTk
 
 # Databáza jedal(nedokoncene)
 jedalna_databaza = {
@@ -16,6 +17,7 @@ jedalna_databaza = {
     'paradajka': 18,
     'losos': 208,
 }
+
 
 try:
     with open('ulozene_jedla.json', 'r') as subor:
@@ -35,6 +37,7 @@ def ulozit_logy():
     with open('ulozene_jedla.json', 'w') as subor:
         json.dump(denny_log, subor, indent=4)
 
+
 def pridat_jedlo():
     global celkove_kalorie
     jedlo = jedlo_var.get()
@@ -45,6 +48,8 @@ def pridat_jedlo():
         aktualizovat_suhrn()
     else:
         messagebox.showerror("Chyba", "Jedlo nie je v databáze. Skúste znova.")
+
+
 def zrusit_posledne_jedlo():
     global celkove_kalorie
     if jedalny_zaznam:
@@ -53,6 +58,7 @@ def zrusit_posledne_jedlo():
         aktualizovat_suhrn()
     else:
         messagebox.showinfo("Informácia", "Nie sú žiadne jedlá na zrušenie.")
+
 
 def aktualizovat_suhrn():
     suhrn_text.config(state=tk.NORMAL)
@@ -75,10 +81,44 @@ def zobrazit_historiu():
             historia_text.insert(tk.END, f"  - {jedlo}: {kalorie} kcal\n")
         historia_text.insert(tk.END, "\n")
     historia_text.config(state=tk.DISABLED)
-    
+
+
+def nastavit_prijem():
+    prijem_okno = tk.Toplevel(root)
+    bg_image = Image.open("food.jpg")
+    bg_photo = ImageTk.PhotoImage(bg_image)
+
+    # Create background label with image
+    bg_label = tk.Label(prijem_okno, image=bg_photo)
+    bg_label.image = bg_photo  # Keep a reference to avoid garbage collection
+    bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+
+    prijem_okno.title("Nastavenie príjmu")
+    prijem_okno.geometry("400x300")  # Set a fixed window size for better design control
+
+    # Set transparent or styled label and slider
+    label_slider = tk.Label(prijem_okno, text="Nastavte cieľový kalorický príjem:",
+                            bg="#ffffff", fg="#333333", font=("Helvetica", 12, "bold"))
+    label_slider.place(relx=0.5, rely=0.3, anchor='center')
+
+    # Customize slider colors
+    slider = tk.Scale(prijem_okno, from_=1000, to=8000, orient='horizontal', length=300,
+                      bg="#ffffff", fg="#000000", troughcolor="#76c7c0", sliderlength=25,
+                      highlightbackground="#ffffff", activebackground="#ffa07a")
+    slider.set(3000)  # Prednastavená hodnota
+    slider.place(relx=0.5, rely=0.5, anchor='center')
+
+
 root = tk.Tk()
 root.title("Počítanie kalórií")
 root.geometry("400x600")
+bg_image = Image.open("food.jpg")
+bg_photo = ImageTk.PhotoImage(bg_image)
+
+# Create background label with image
+bg_label = tk.Label(root, image=bg_photo)
+bg_label.image = bg_photo  # Keep a reference to avoid garbage collection
+bg_label.place(x=0, y=0, relwidth=1, relheight=1)
 
 jedlo_var = tk.StringVar()
 jedlo_label = tk.Label(root, text="Vyberte si jedlo:")
@@ -97,6 +137,10 @@ zrusit_button.pack()
 # Button na zobrazenie historie
 historia_button = tk.Button(root, text="Zobraziť históriu", command=zobrazit_historiu)
 historia_button.pack()
+
+# Button na denny prijem
+prijem_button = tk.Button(root, text="Nastaviť denný príjem", command=nastavit_prijem)
+prijem_button.pack()
 
 # Button na ulozenie historie
 ulozit_button = tk.Button(root, text="Uložiť údaje", command=ulozit_logy)
