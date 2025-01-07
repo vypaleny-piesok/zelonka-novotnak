@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
+from tkinter import ttk
 import datetime
 import json
 from PIL import Image, ImageTk
@@ -119,38 +120,44 @@ bg_photo = ImageTk.PhotoImage(bg_image)
 bg_label = tk.Label(root, image=bg_photo)
 bg_label.image = bg_photo  # Keep a reference to avoid garbage collection
 bg_label.place(x=0, y=0, relwidth=1, relheight=1)
-
 jedlo_var = tk.StringVar()
-jedlo_label = tk.Label(root, text="Vyberte si jedlo:")
-jedlo_label.pack()
-jedlo_menu = tk.OptionMenu(root, jedlo_var, *jedalna_databaza.keys())
-jedlo_menu.pack()
+jedlo_label = tk.Label(root, text="Vyberte si jedlo:", bg="#ffffff", fg="#333333", font=("Helvetica", 12, "bold"))
+jedlo_label.pack(pady=10)
+jedlo_menu = ttk.Combobox(root, textvariable=jedlo_var, values=list(jedalna_databaza.keys()), state="readonly")
+jedlo_menu.pack(pady=5)
 
-# Button na pridanie jedla
-pridat_button = tk.Button(root, text="Pridať jedlo", command=pridat_jedlo)
-pridat_button.pack()
+# Create a style for the buttons
+style = ttk.Style()
+style.configure("TButton",
+                font=("Helvetica", 10, "bold"),
+                background="#76c7c0",
+                foreground="black",
+                padding=10,
+                borderwidth=0,
+                focuscolor='none')
 
-# Button na zrusenie posledneho jedla
-zrusit_button = tk.Button(root, text="Zrušiť posledné jedlo", command=zrusit_posledne_jedlo)
-zrusit_button.pack()
+# Modern buttons with style and positioning
+pridat_button = ttk.Button(root, text="Pridať jedlo", command=pridat_jedlo, style="TButton")
+pridat_button.pack(pady=10)
 
-# Button na zobrazenie historie
-historia_button = tk.Button(root, text="Zobraziť históriu", command=zobrazit_historiu)
-historia_button.pack()
+zrusit_button = ttk.Button(root, text="Zrušiť posledné jedlo", command=zrusit_posledne_jedlo, style="TButton")
+zrusit_button.pack(pady=10)
 
-# Button na denny prijem
-prijem_button = tk.Button(root, text="Nastaviť denný príjem", command=nastavit_prijem)
-prijem_button.pack()
+historia_button = ttk.Button(root, text="Zobraziť históriu", command=zobrazit_historiu, style="TButton")
+historia_button.pack(pady=10)
 
-# Button na ulozenie historie
-ulozit_button = tk.Button(root, text="Uložiť údaje", command=ulozit_logy)
-ulozit_button.pack()
+prijem_button = ttk.Button(root, text="Nastaviť denný príjem", command=nastavit_prijem, style="TButton")
+prijem_button.pack(pady=10)
 
-# Zobrazenie prijmu kalorii
-suhrn_label = tk.Label(root, text="📊 Súhrn príjmu kalórií:")
-suhrn_label.pack()
-suhrn_text = tk.Text(root, height=15, width=50, state=tk.DISABLED)
-suhrn_text.pack()
+ulozit_button = ttk.Button(root, text="Uložiť údaje", command=ulozit_logy, style="TButton")
+ulozit_button.pack(pady=10)
+
+# Display summary of calorie intake
+suhrn_label = tk.Label(root, text="📊 Súhrn príjmu kalórií:", bg="#ffffff", fg="#333333", font=("Helvetica", 12, "bold"))
+suhrn_label.pack(pady=10)
+suhrn_text = tk.Text(root, height=15, width=50, state=tk.DISABLED, bg="#f5f5f5", fg="#333333", font=("Helvetica", 10))
+suhrn_text.pack(pady=10)
+
 
 root.mainloop()
 
