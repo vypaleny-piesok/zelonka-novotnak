@@ -20,7 +20,30 @@ jedalna_databaza = {
     'zemiaky': 77,
     'paradajka': 18,
     'losos': 208,
+    'avokádo': 160,
+    'mandle': 579,
+    'jahody': 32,
+    'hrozno': 69,
+    'kukurica': 96,
+    'melón': 30,
+    'mrkva': 41,
+    'špenát': 23,
+    'tuniak': 132,
+    'tofu': 144,
+    'uhorka': 16,
+    'karfiol': 25,
+    'paprika': 20,
+    'kiwi': 61,
+    'čučoriedky': 57,
+    'ovsené vločky': 389,
+    'mleté hovädzie': 250,
+    'jogurt (plnotučný)': 61,
+    'prírodný tvaroh': 98,
+    'šunka': 145,
+    'parmezán': 431,
+    'čedar': 402,
 }
+
 
 # Load previous data (log and target caloric intake)
 try:
