@@ -5,6 +5,9 @@ import datetime
 import json
 from PIL import Image, ImageTk
 
+# Default target caloric intake (in case there's no saved value)
+default_ciel = 3000
+
 # Databáza jedál
 jedalna_databaza = {
     'jablko': 52,
@@ -19,11 +22,14 @@ jedalna_databaza = {
     'losos': 208,
 }
 
+# Load previous data (log and target caloric intake)
 try:
     with open('ulozene_jedla.json', 'r') as subor:
         denny_log = json.load(subor)
+        ciel = denny_log.get('ciel', default_ciel)  # Load 'ciel' if it exists, else use default_ciel
 except FileNotFoundError:
     denny_log = {}
+    ciel = default_ciel
 
 celkove_kalorie = 0
 jedalny_zaznam = []
@@ -40,13 +46,12 @@ def nacitat_denne_jedla():
         aktualizovat_suhrn()
 
 
-
 def ulozit_logy():
     dnes = datetime.date.today().isoformat()
     denny_log[dnes] = jedalny_zaznam  # Prepíš dnešný záznam aktuálnymi údajmi
+    denny_log['ciel'] = ciel  # Save 'ciel' to JSON
     with open('ulozene_jedla.json', 'w') as subor:
         json.dump(denny_log, subor, indent=4)
-
 
 
 def pridat_jedlo():
@@ -81,16 +86,12 @@ def zrusit_posledne_jedlo():
         messagebox.showinfo("Informácia", "Nie sú žiadne jedlá na zrušenie.")
 
 
-
-
-
-
 def aktualizovat_suhrn():
     suhrn_text.config(state=tk.NORMAL)
     suhrn_text.delete(1.0, tk.END)
     for polozka, kal in jedalny_zaznam:
         suhrn_text.insert(tk.END, f"- {polozka}: {kal} kcal\n")
-    suhrn_text.insert(tk.END, f"\n🔥 Celkový počet kalórií: {celkove_kalorie} kcal")
+    suhrn_text.insert(tk.END, f"\n🔥 Celkový počet kalórií: {celkove_kalorie} kcal \n To je {round((celkove_kalorie/ciel)*100)}% z vášho príjmu")
     suhrn_text.config(state=tk.DISABLED)
 
 
@@ -108,9 +109,18 @@ def zobrazit_historiu():
     historia_text.config(state=tk.DISABLED)
 
 
+def denny_prijem():
+    global ciel
+    value = slider.get()
+    prijem_label.config(text=f"Cieľový kalorický príjem: {value} kcal")
+    ciel = value
+    prijem_okno.destroy()
+
+
 def nastavit_prijem():
+    global slider, prijem_okno
     prijem_okno = tk.Toplevel(root)
-    bg_image = Image.open("")
+    bg_image = Image.open("food.jpg")
     bg_photo = ImageTk.PhotoImage(bg_image)
 
     bg_label = tk.Label(prijem_okno, image=bg_photo)
@@ -127,13 +137,16 @@ def nastavit_prijem():
     slider = tk.Scale(prijem_okno, from_=1000, to=8000, orient='horizontal', length=300,
                       bg="#ffffff", fg="#000000", troughcolor="#76c7c0", sliderlength=25,
                       highlightbackground="#ffffff", activebackground="#ffa07a")
-    slider.set(3000)
+    slider.set(ciel)
+
+    button = tk.Button(prijem_okno, text="Potvrdiť", command=denny_prijem)
+    button.place(relx=0.5, rely=0.7, anchor='center')
+
     slider.place(relx=0.5, rely=0.5, anchor='center')
 
 
-# Funkcia na vymazanie dnešných jedal
+# Funkcia na vymazanie dnešných jedál
 def vymazat_denne_jedla():
-    """Vymaže všetky jedlá za dnešný deň."""
     global celkove_kalorie, jedalny_zaznam
     dnes = datetime.date.today().isoformat()
     if dnes in denny_log:
@@ -149,7 +162,7 @@ def vymazat_denne_jedla():
 root = tk.Tk()
 root.title("Počítanie kalórií")
 root.geometry("400x600")
-bg_image = Image.open("")
+bg_image = Image.open("food.jpg")
 bg_photo = ImageTk.PhotoImage(bg_image)
 
 bg_label = tk.Label(root, image=bg_photo)
@@ -178,10 +191,15 @@ prijem_button.pack(pady=10)
 vymazat_button = ttk.Button(root, text="Vymazať dnešné jedlá", command=vymazat_denne_jedla)
 vymazat_button.pack(pady=10)
 
+prijem_label = tk.Label(root, text=f"Cieľový kalorický príjem: {ciel}", font=("Helvetica", 12))
+prijem_label.pack(pady=20)
+
 suhrn_text = tk.Text(root, height=15, width=50, state=tk.DISABLED)
 suhrn_text.pack(pady=10)
 
 nacitat_denne_jedla()
-root.mainloop()
 
-ulozit_logy()
+# Add function to save data when the window is closed
+root.protocol("WM_DELETE_WINDOW", lambda: (ulozit_logy(), root.destroy()))
+
+root.mainloop()
