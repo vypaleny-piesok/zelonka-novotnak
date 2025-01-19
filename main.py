@@ -37,13 +37,19 @@ jedalna_databaza = {
     'čučoriedky': 57,
     'ovsené vločky': 389,
     'mleté hovädzie': 250,
-    'jogurt (plnotučný)': 61,
+    'jogurt (biely)': 61,
     'prírodný tvaroh': 98,
     'šunka': 145,
     'parmezán': 431,
     'čedar': 402,
+    "Vlašské orechy": 654,
+    "Arašidové maslo": 588,
+    "Ovesné vločky": 389,
+    "Čokoláda (70% kakaa)": 598,
+    "Chlieb (tmavý)": 247,
+    "Syr Eidam (30%)": 280,
+    "Olivový olej (1 lyžica)": 119
 }
-
 
 # Load previous data (log and target caloric intake)
 try:
@@ -124,12 +130,16 @@ def zobrazit_historiu():
     historia_text = tk.Text(historia_okno, height=20, width=50)
     historia_text.pack()
     historia_text.config(state=tk.NORMAL)
+
     for datum, zaznamy in denny_log.items():
-        historia_text.insert(tk.END, f"📅 {datum}\n")
-        for jedlo, kalorie in zaznamy:
-            historia_text.insert(tk.END, f"  - {jedlo}: {kalorie} kcal\n")
-        historia_text.insert(tk.END, "\n")
+        if isinstance(zaznamy, list):  # Only process entries that are lists of food records
+            historia_text.insert(tk.END, f"📅 {datum}\n")
+            for jedlo, kalorie in zaznamy:
+                historia_text.insert(tk.END, f"  - {jedlo}: {kalorie} kcal\n")
+            historia_text.insert(tk.END, "\n")
+
     historia_text.config(state=tk.DISABLED)
+
 
 
 def denny_prijem():
@@ -179,7 +189,6 @@ def vymazat_denne_jedla():
     aktualizovat_suhrn()
     ulozit_logy()
     messagebox.showinfo("Vymazané", "Všetky jedlá za dnešný deň boli vymazané.")
-
 
 # Hlavné GUI
 root = tk.Tk()
